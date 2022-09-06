@@ -1,7 +1,7 @@
 
 create table users(
     userid int not null auto_increment,
-    username varchar_ignorecase(50) not null ,
+    username varchar_ignorecase(50) not null unique,
     password varchar_ignorecase(500) not null,
     role varchar(50) not null,
     enabled boolean not null,
