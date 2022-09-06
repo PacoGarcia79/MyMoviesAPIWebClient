@@ -26,9 +26,9 @@ create table user_movie(
 
 INSERT INTO `users` (`username`,`password`,`role`,`enabled`)
 VALUES ('user',
-'$2a$10$XptfskLsT1l/bRTLRiiCgejHqOpgXFreUnNUa35gJdCr2v2QbVFzu',
+'$2a$10$oKvSi8zIxr2A9x0N9zMZ5e0lkZOHzOogdsoxnUdbqG./uK/w.3oY2',
 'ROLE_USER', 1);
 INSERT INTO `users` (`username`,`password`,`role`,`enabled`)
 VALUES ('admin',
-'$2a$10$XptfskLsT1l/bRTLRiiCgejHqOpgXFreUnNUa35gJdCr2v2QbVFzu',
+'$2a$10$oKvSi8zIxr2A9x0N9zMZ5e0lkZOHzOogdsoxnUdbqG./uK/w.3oY2',
 'ROLE_ADMIN', 1);
