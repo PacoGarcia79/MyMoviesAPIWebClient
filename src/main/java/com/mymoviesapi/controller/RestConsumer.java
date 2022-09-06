@@ -26,18 +26,18 @@ import com.mymoviesapi.model.UserMovie;
 @RequestMapping("/api")
 public class RestConsumer {
 
-	private static final String MAIN_ENDPOINT = "https://api.themoviedb.org/3/";
+	private static final String MAIN_ENDPOINT = "https://api.themoviedb.org/3/movie/";
 
 	@Autowired
 	RestTemplate restTemplate;
 
 	@Autowired
-	HttpEntity request;
+	HttpEntity<?> request;
 
 	@GetMapping("/movie/popular")
 	public ResponseEntity<String> getPopularMovies() {
 
-		String resourceUrl = MAIN_ENDPOINT + "/movie/popular";
+		String resourceUrl = MAIN_ENDPOINT + "popular";
 
 		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
 	}
@@ -45,7 +45,7 @@ public class RestConsumer {
 	@GetMapping("/movie/top_rated")
 	public ResponseEntity<String> getTopRatedMovies() {
 
-		String resourceUrl = MAIN_ENDPOINT + "/movie/top_rated";
+		String resourceUrl = MAIN_ENDPOINT + "top_rated";
 
 		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
 
@@ -53,7 +53,7 @@ public class RestConsumer {
 
 	@GetMapping("/movie/{movie_id}")
 	public ResponseEntity<JsonObject> getMovie(@PathVariable String movie_id) throws SQLException {
-		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movie_id;
+		String resourceUrl = MAIN_ENDPOINT + movie_id;
 
 		ResponseEntity<String> responseEntity = restTemplate.exchange(resourceUrl, HttpMethod.GET, request,
 				String.class);
@@ -65,63 +65,16 @@ public class RestConsumer {
 			int userId = H2JDBCService.getAuthenticatedUserId(currentUserName);
 			UserMovie userMovie = H2JDBCService.getUser_movieByID(Integer.parseInt(movie_id), userId);
 
-			return checkUser(userMovie, responseEntity, jsonResponse);
+			return configureJsonResponse(userMovie, responseEntity, jsonResponse);
 
 		}
 		return responseEntity.ok(new JsonParser().parse("{}").getAsJsonObject());
 	}
 
-//	@GetMapping("/movie/{movie_id}")
-//	public Movie getMovie(@PathVariable("movie_id") int movieId) {
-//
-//		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movieId;
-//		
-//		ResponseEntity<Movie> movie = restTemplate.exchange(resourceUrl, HttpMethod.GET, request, Movie.class);
-//		
-//		movie.getBody().setFavorite(false);
-//		movie.getBody().setNotes("");
-//		movie.getBody().setPersonalRating(0);
-//
-//		return movie.getBody();
-//	}
-
-//	@PatchMapping("/movie/{movie_id}")
-//	public ResponseEntity<String> postMovie(@PathVariable int movie_id, @RequestBody UserMovie user_movie)
-//			throws SQLException {
-//		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movie_id + "?language=es-ES";
-//
-//		String currentUserName = "";
-//
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		if (!(authentication instanceof AnonymousAuthenticationToken)) {
-//
-//			currentUserName = authentication.getName();
-//			System.out.println(currentUserName);
-//			int userId = H2JDBCService.getAuthenticatedUserId(currentUserName);
-//			user_movie.setUserid(userId);
-//			try {
-//
-//				UserMovie user = H2JDBCService.getUser_movieByID(movie_id, userId);
-//
-//				if (user == null) {
-//					H2JDBCService.insertRecord(user_movie, movie_id);
-//				} else {
-//					H2JDBCService.updateRecord(user_movie, movie_id);
-//				}
-//
-//			} catch (SQLException e) {
-//
-//				e.printStackTrace();
-//			}
-//		}
-//
-//		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
-//	}
-
 	@PatchMapping("/movie/{movie_id}")
 	public ResponseEntity<JsonObject> postMovie(@PathVariable int movie_id, @RequestBody UserMovie user_movie)
 			throws SQLException {
-		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movie_id + "?language=es-ES";
+		String resourceUrl = MAIN_ENDPOINT + movie_id + "?language=es-ES";
 
 		String currentUserName = "";
 		int userId = 0;
@@ -154,11 +107,11 @@ public class RestConsumer {
 				String.class);
 		String jsonResponse = responseEntity.getBody();
 
-		return checkUser(userMovie, responseEntity, jsonResponse);
+		return configureJsonResponse(userMovie, responseEntity, jsonResponse);
 
 	}
 
-	private ResponseEntity<JsonObject> checkUser(UserMovie userMovie, ResponseEntity<String> responseEntity,
+	private ResponseEntity<JsonObject> configureJsonResponse(UserMovie userMovie, ResponseEntity<String> responseEntity,
 			String jsonResponse) {
 		if (userMovie == null) {
 			String json = jsonResponse.substring(0, jsonResponse.length() - 1)
@@ -180,7 +133,7 @@ public class RestConsumer {
 	@GetMapping("/movie/{movie_id}/credits")
 	public ResponseEntity<String> getMovieCredits(@PathVariable("movie_id") int movieId) {
 
-		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movieId + "/credits";
+		String resourceUrl = MAIN_ENDPOINT + movieId + "/credits";
 
 		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
 	}
@@ -188,7 +141,7 @@ public class RestConsumer {
 	@GetMapping("/movie/{movie_id}/images")
 	public ResponseEntity<String> getMovieImages(@PathVariable("movie_id") int movieId) {
 
-		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movieId + "/images";
+		String resourceUrl = MAIN_ENDPOINT + movieId + "/images";
 
 		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
 	}
@@ -196,7 +149,7 @@ public class RestConsumer {
 	@GetMapping("/movie/{movie_id}/keywords")
 	public ResponseEntity<String> getMovieKeyWords(@PathVariable("movie_id") int movieId) {
 
-		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movieId + "/keywords";
+		String resourceUrl = MAIN_ENDPOINT + movieId + "/keywords";
 
 		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
 	}
@@ -204,7 +157,7 @@ public class RestConsumer {
 	@GetMapping("/movie/{movie_id}/recommendations")
 	public ResponseEntity<String> getMovieRecommendations(@PathVariable("movie_id") int movieId) {
 
-		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movieId + "/recommendations";
+		String resourceUrl = MAIN_ENDPOINT + movieId + "/recommendations";
 
 		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
 	}
@@ -212,7 +165,7 @@ public class RestConsumer {
 	@GetMapping("/movie/{movie_id}/similar")
 	public ResponseEntity<String> getSimilarMovies(@PathVariable("movie_id") int movieId) {
 
-		String resourceUrl = MAIN_ENDPOINT + "/movie/" + movieId + "/similar";
+		String resourceUrl = MAIN_ENDPOINT + movieId + "/similar";
 
 		return restTemplate.exchange(resourceUrl, HttpMethod.GET, request, String.class);
 	}
