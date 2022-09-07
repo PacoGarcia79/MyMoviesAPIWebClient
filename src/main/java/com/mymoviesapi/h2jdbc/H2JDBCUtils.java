@@ -15,7 +15,7 @@ public class H2JDBCUtils {
 		try {
 			connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			printSQLException(e);
 		}
 		return connection;
 	}

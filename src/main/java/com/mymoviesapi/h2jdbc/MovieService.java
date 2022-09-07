@@ -5,10 +5,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.mymoviesapi.model.UserMovie;
 
-public class H2JDBCService {
+@Service
+public class MovieService {
+
+	WebClient webClient = WebClient.create("https://api.themoviedb.org/3/movie/");
+
+	@Value("${themoviedatabase.api_key}")
+	private String api_key;
 
 	private static final String INSERT_USER_SQL = "INSERT INTO user_movie"
 			+ "  (userid , movieid , favorite , personal_rating , notes ) VALUES " + " (?, ?, ?, ?, ?);";
@@ -22,11 +33,11 @@ public class H2JDBCService {
 		try (Connection connection = H2JDBCUtils.getConnection();
 
 				PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_SQL)) {
-			
-			if(user_movie.getPersonal_rating()<0 || user_movie.getPersonal_rating()>5) {
-                throw new SQLException("Bad personal rating");
-            }
-			
+
+			if (user_movie.getPersonal_rating() < 0 || user_movie.getPersonal_rating() > 5) {
+				throw new SQLException("Bad personal rating");
+			}
+
 			preparedStatement.setInt(1, user_movie.getUserid());
 			preparedStatement.setInt(2, id_movie);
 			preparedStatement.setBoolean(3, user_movie.isFavourite());
@@ -45,11 +56,11 @@ public class H2JDBCService {
 		try (Connection connection = H2JDBCUtils.getConnection();
 
 				PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USER_SQL)) {
-			
-			if(user_movie.getPersonal_rating()<0 || user_movie.getPersonal_rating()>5) {
-                throw new SQLException("Bad personal rating");
-            }
-			
+
+			if (user_movie.getPersonal_rating() < 0 || user_movie.getPersonal_rating() > 5) {
+				throw new SQLException("Bad personal rating");
+			}
+
 			preparedStatement.setInt(1, (user_movie.isFavourite() ? 1 : 0));
 			preparedStatement.setInt(2, user_movie.getPersonal_rating());
 			preparedStatement.setString(3, user_movie.getNotes());
@@ -103,6 +114,52 @@ public class H2JDBCService {
 			return 0;
 
 		}
+	}
+	
+	public HashMap<String, Object> getMovie(int movieId) {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}").queryParam("api_key", api_key)
+				.build(movieId))
+				.retrieve().bodyToMono(HashMap.class).block();
+	}
+
+	public HashMap<String, Object> getPopularMovies() {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("popular").queryParam("api_key", api_key).build())
+				.retrieve().bodyToMono(HashMap.class).block();
+	}
+	
+	public HashMap<String, Object> getTopRatedMovies() {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("top_rated").queryParam("api_key", api_key).build())
+				.retrieve().bodyToMono(HashMap.class).block();
+	}
+	
+	public HashMap<String, Object> getMovieImages(int movieId) {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/images").queryParam("api_key", api_key)
+				.build(movieId))
+				.retrieve().bodyToMono(HashMap.class).block();
+	}
+	
+	public HashMap<String, Object> getMovieCredits(int movieId) {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/credits").queryParam("api_key", api_key)
+				.build(movieId))
+				.retrieve().bodyToMono(HashMap.class).block();
+	}
+	
+	public HashMap<String, Object> getMovieKeyWords(int movieId) {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/keywords").queryParam("api_key", api_key)
+				.build(movieId))
+				.retrieve().bodyToMono(HashMap.class).block();
+	}
+	
+	public HashMap<String, Object> getMovieRecommendations(int movieId) {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/recommendations").queryParam("api_key", api_key)
+				.build(movieId))
+				.retrieve().bodyToMono(HashMap.class).block();
+	}
+	
+	public HashMap<String, Object> getSimilarMovies(int movieId) {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/similar").queryParam("api_key", api_key)
+				.build(movieId))
+				.retrieve().bodyToMono(HashMap.class).block();
 	}
 
 }
