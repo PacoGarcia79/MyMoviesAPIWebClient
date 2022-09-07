@@ -32,8 +32,8 @@ public class MovieController {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 			String currentUserName = authentication.getName();
-			int userId = MovieService.getAuthenticatedUserId(currentUserName);
-			UserMovie userMovie = MovieService.getUser_movieByID(movieId, userId);
+			int userId = movieService.getAuthenticatedUserId(currentUserName);
+			UserMovie userMovie = movieService.getUser_movieByID(movieId, userId);
 
 			configureMovieResponse(movie, userMovie);
 
@@ -69,16 +69,16 @@ public class MovieController {
 
 			currentUserName = authentication.getName();
 			System.out.println(currentUserName);
-			userId = MovieService.getAuthenticatedUserId(currentUserName);
+			userId = movieService.getAuthenticatedUserId(currentUserName);
 			user_movie.setUserid(userId);
 			try {
 
-				UserMovie user = MovieService.getUser_movieByID(movie_id, userId);
+				UserMovie user = movieService.getUser_movieByID(movie_id, userId);
 
 				if (user == null) {
-					MovieService.insertRecord(user_movie, movie_id);
+					movieService.insertRecord(user_movie, movie_id);
 				} else {
-					MovieService.updateRecord(user_movie, movie_id);
+					movieService.updateRecord(user_movie, movie_id);
 				}
 
 			} catch (SQLException e) {
@@ -87,7 +87,7 @@ public class MovieController {
 			}
 		}
 
-		UserMovie userMovie = MovieService.getUser_movieByID(movie_id, userId);
+		UserMovie userMovie = movieService.getUser_movieByID(movie_id, userId);
 		HashMap<String, Object> movie = movieService.getMovie(movie_id);
 
 		configureMovieResponse(movie, userMovie);

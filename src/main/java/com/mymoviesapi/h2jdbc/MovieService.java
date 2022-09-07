@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -28,7 +29,7 @@ public class MovieService {
 
 	private static final String GET_USER_SQL = "select userid , movieid , favorite , personal_rating , notes from user_movie where userid =? and movieid=?;";
 
-	public static void insertRecord(UserMovie user_movie, int id_movie) throws SQLException {
+	public void insertRecord(UserMovie user_movie, int id_movie) throws SQLException {
 
 		try (Connection connection = H2JDBCUtils.getConnection();
 
@@ -51,7 +52,7 @@ public class MovieService {
 
 	}
 
-	public static void updateRecord(UserMovie user_movie, int id_movie) throws SQLException {
+	public void updateRecord(UserMovie user_movie, int id_movie) throws SQLException {
 
 		try (Connection connection = H2JDBCUtils.getConnection();
 
@@ -74,7 +75,7 @@ public class MovieService {
 
 	}
 
-	public static UserMovie getUser_movieByID(int id_movie, int user_id) throws SQLException {
+	public UserMovie getUser_movieByID(int id_movie, int user_id) throws SQLException {
 
 		try (Connection connection = H2JDBCUtils.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(GET_USER_SQL);) {
@@ -102,7 +103,7 @@ public class MovieService {
 		return null;
 	}
 
-	public static int getAuthenticatedUserId(String userName) throws SQLException {
+	public int getAuthenticatedUserId(String userName) throws SQLException {
 		String consulta = "select userid from users where username = '" + userName + "'";
 		try (Connection connection = H2JDBCUtils.getConnection(); Statement statement = connection.createStatement()) {
 
@@ -115,50 +116,57 @@ public class MovieService {
 
 		}
 	}
-	
+
+	@Cacheable("movie")
 	public HashMap<String, Object> getMovie(int movieId) {
-		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}").queryParam("api_key", api_key)
-				.build(movieId))
+		return webClient.get()
+				.uri(uriBuilder -> uriBuilder.path("{movie_id}").queryParam("api_key", api_key).build(movieId))
 				.retrieve().bodyToMono(HashMap.class).block();
 	}
 
+	@Cacheable("popular")
 	public HashMap<String, Object> getPopularMovies() {
 		return webClient.get().uri(uriBuilder -> uriBuilder.path("popular").queryParam("api_key", api_key).build())
 				.retrieve().bodyToMono(HashMap.class).block();
 	}
-	
+
+	@Cacheable("top_rated")
 	public HashMap<String, Object> getTopRatedMovies() {
 		return webClient.get().uri(uriBuilder -> uriBuilder.path("top_rated").queryParam("api_key", api_key).build())
 				.retrieve().bodyToMono(HashMap.class).block();
 	}
-	
+
+	@Cacheable("images")
 	public HashMap<String, Object> getMovieImages(int movieId) {
-		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/images").queryParam("api_key", api_key)
-				.build(movieId))
+		return webClient.get()
+				.uri(uriBuilder -> uriBuilder.path("{movie_id}/images").queryParam("api_key", api_key).build(movieId))
 				.retrieve().bodyToMono(HashMap.class).block();
 	}
-	
+
+	@Cacheable("credits")
 	public HashMap<String, Object> getMovieCredits(int movieId) {
-		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/credits").queryParam("api_key", api_key)
-				.build(movieId))
+		return webClient.get()
+				.uri(uriBuilder -> uriBuilder.path("{movie_id}/credits").queryParam("api_key", api_key).build(movieId))
 				.retrieve().bodyToMono(HashMap.class).block();
 	}
-	
+
+	@Cacheable("keywords")
 	public HashMap<String, Object> getMovieKeyWords(int movieId) {
-		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/keywords").queryParam("api_key", api_key)
-				.build(movieId))
+		return webClient.get()
+				.uri(uriBuilder -> uriBuilder.path("{movie_id}/keywords").queryParam("api_key", api_key).build(movieId))
 				.retrieve().bodyToMono(HashMap.class).block();
 	}
-	
+
+	@Cacheable("recommendations")
 	public HashMap<String, Object> getMovieRecommendations(int movieId) {
-		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/recommendations").queryParam("api_key", api_key)
-				.build(movieId))
-				.retrieve().bodyToMono(HashMap.class).block();
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/recommendations")
+				.queryParam("api_key", api_key).build(movieId)).retrieve().bodyToMono(HashMap.class).block();
 	}
-	
+
+	@Cacheable("similar")
 	public HashMap<String, Object> getSimilarMovies(int movieId) {
-		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/similar").queryParam("api_key", api_key)
-				.build(movieId))
+		return webClient.get()
+				.uri(uriBuilder -> uriBuilder.path("{movie_id}/similar").queryParam("api_key", api_key).build(movieId))
 				.retrieve().bodyToMono(HashMap.class).block();
 	}
 
