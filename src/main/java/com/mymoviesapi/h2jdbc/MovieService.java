@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -117,57 +118,88 @@ public class MovieService {
 		}
 	}
 
+	/**
+	 * Using .block()
+	 * 
+	 * @param movieId
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+//	@Cacheable("top_rated")
+//	public HashMap<String, Object> getTopRatedMovies() {
+//		return webClient.get().uri(uriBuilder -> uriBuilder.path("top_rated").queryParam("api_key", api_key).build())
+//				.retrieve().bodyToMono(HashMap.class).block();
+//	}
+
+	/**
+	 * Using .toFuture().get()
+	 * 
+	 * @param movieId
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
 	@Cacheable("movie")
-	public HashMap<String, Object> getMovie(int movieId) {
+	public HashMap<String, Object> getMovie(int movieId) throws InterruptedException, ExecutionException {
 		return webClient.get()
 				.uri(uriBuilder -> uriBuilder.path("{movie_id}").queryParam("api_key", api_key).build(movieId))
-				.retrieve().bodyToMono(HashMap.class).block();
+				.retrieve().bodyToMono(HashMap.class).toFuture().get();
 	}
 
 	@Cacheable("popular")
-	public HashMap<String, Object> getPopularMovies() {
+	public HashMap<String, Object> getPopularMovies() throws InterruptedException, ExecutionException {
 		return webClient.get().uri(uriBuilder -> uriBuilder.path("popular").queryParam("api_key", api_key).build())
-				.retrieve().bodyToMono(HashMap.class).block();
+				.retrieve().bodyToMono(HashMap.class).toFuture().get();
 	}
 
 	@Cacheable("top_rated")
-	public HashMap<String, Object> getTopRatedMovies() {
+	public HashMap<String, Object> getTopRatedMovies() throws InterruptedException, ExecutionException {
 		return webClient.get().uri(uriBuilder -> uriBuilder.path("top_rated").queryParam("api_key", api_key).build())
-				.retrieve().bodyToMono(HashMap.class).block();
+				.retrieve().bodyToMono(HashMap.class).toFuture().get();
 	}
 
 	@Cacheable("images")
-	public HashMap<String, Object> getMovieImages(int movieId) {
+	public HashMap<String, Object> getMovieImages(int movieId) throws InterruptedException, ExecutionException {
 		return webClient.get()
 				.uri(uriBuilder -> uriBuilder.path("{movie_id}/images").queryParam("api_key", api_key).build(movieId))
-				.retrieve().bodyToMono(HashMap.class).block();
+				.retrieve().bodyToMono(HashMap.class).toFuture().get();
 	}
 
 	@Cacheable("credits")
-	public HashMap<String, Object> getMovieCredits(int movieId) {
+	public HashMap<String, Object> getMovieCredits(int movieId) throws InterruptedException, ExecutionException {
 		return webClient.get()
 				.uri(uriBuilder -> uriBuilder.path("{movie_id}/credits").queryParam("api_key", api_key).build(movieId))
-				.retrieve().bodyToMono(HashMap.class).block();
+				.retrieve().bodyToMono(HashMap.class).toFuture().get();
 	}
 
 	@Cacheable("keywords")
-	public HashMap<String, Object> getMovieKeyWords(int movieId) {
+	public HashMap<String, Object> getMovieKeyWords(int movieId) throws InterruptedException, ExecutionException {
 		return webClient.get()
 				.uri(uriBuilder -> uriBuilder.path("{movie_id}/keywords").queryParam("api_key", api_key).build(movieId))
-				.retrieve().bodyToMono(HashMap.class).block();
-	}
-
-	@Cacheable("recommendations")
-	public HashMap<String, Object> getMovieRecommendations(int movieId) {
-		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/recommendations")
-				.queryParam("api_key", api_key).build(movieId)).retrieve().bodyToMono(HashMap.class).block();
+				.retrieve().bodyToMono(HashMap.class).toFuture().get();
 	}
 
 	@Cacheable("similar")
-	public HashMap<String, Object> getSimilarMovies(int movieId) {
+	public HashMap<String, Object> getSimilarMovies(int movieId) throws InterruptedException, ExecutionException {
 		return webClient.get()
 				.uri(uriBuilder -> uriBuilder.path("{movie_id}/similar").queryParam("api_key", api_key).build(movieId))
-				.retrieve().bodyToMono(HashMap.class).block();
+				.retrieve().bodyToMono(HashMap.class).toFuture().get();
+	}
+
+	/**
+	 * Using share().block()
+	 * 
+	 * @param movieId
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+	@Cacheable("recommendations")
+	public HashMap<String, Object> getMovieRecommendations(int movieId)
+			throws InterruptedException, ExecutionException {
+		return webClient.get().uri(uriBuilder -> uriBuilder.path("{movie_id}/recommendations")
+				.queryParam("api_key", api_key).build(movieId)).retrieve().bodyToMono(HashMap.class).share().block();
 	}
 
 }

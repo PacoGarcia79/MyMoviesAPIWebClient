@@ -2,6 +2,7 @@ package com.mymoviesapi.controller;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -25,7 +26,7 @@ public class MovieController {
 	MovieService movieService;
 
 	@GetMapping("/movie/{movie_id}")
-	public HashMap<String, Object> getMovie(@PathVariable("movie_id") int movieId) throws SQLException {
+	public HashMap<String, Object> getMovie(@PathVariable("movie_id") int movieId) throws SQLException, InterruptedException, ExecutionException {
 
 		HashMap<String, Object> movie = movieService.getMovie(movieId);
 
@@ -59,7 +60,7 @@ public class MovieController {
 
 	@PatchMapping("/movie/{movie_id}")
 	public HashMap<String, Object> postMovie(@PathVariable int movie_id, @RequestBody UserMovie user_movie)
-			throws SQLException {
+			throws SQLException, InterruptedException, ExecutionException {
 
 		String currentUserName = "";
 		int userId = 0;
@@ -70,6 +71,7 @@ public class MovieController {
 			currentUserName = authentication.getName();
 			System.out.println(currentUserName);
 			userId = movieService.getAuthenticatedUserId(currentUserName);
+			System.out.println("USER ID -> " + userId);
 			user_movie.setUserid(userId);
 			try {
 
@@ -96,43 +98,43 @@ public class MovieController {
 	}
 
 	@GetMapping("/movie/popular")
-	public HashMap<String, Object> getPopularMovies() {
+	public HashMap<String, Object> getPopularMovies() throws InterruptedException, ExecutionException {
 
 		return movieService.getPopularMovies();
 	}
 
 	@GetMapping("/movie/top_rated")
-	public HashMap<String, Object> getTopRatedMovies() {
+	public HashMap<String, Object> getTopRatedMovies() throws InterruptedException, ExecutionException {
 
 		return movieService.getTopRatedMovies();
 	}
 
 	@GetMapping("/movie/{movie_id}/credits")
-	public HashMap<String, Object> getMovieCredits(@PathVariable("movie_id") int movieId) {
+	public HashMap<String, Object> getMovieCredits(@PathVariable("movie_id") int movieId) throws InterruptedException, ExecutionException {
 
 		return movieService.getMovieCredits(movieId);
 	}
 
 	@GetMapping("/movie/{movie_id}/images")
-	public HashMap<String, Object> getMovieImages(@PathVariable("movie_id") int movieId) {
+	public HashMap<String, Object> getMovieImages(@PathVariable("movie_id") int movieId) throws InterruptedException, ExecutionException {
 
 		return movieService.getMovieImages(movieId);
 	}
 
 	@GetMapping("/movie/{movie_id}/keywords")
-	public HashMap<String, Object> getMovieKeyWords(@PathVariable("movie_id") int movieId) {
+	public HashMap<String, Object> getMovieKeyWords(@PathVariable("movie_id") int movieId) throws InterruptedException, ExecutionException {
 
 		return movieService.getMovieKeyWords(movieId);
 	}
 
 	@GetMapping("/movie/{movie_id}/recommendations")
-	public HashMap<String, Object> getMovieRecommendations(@PathVariable("movie_id") int movieId) {
+	public HashMap<String, Object> getMovieRecommendations(@PathVariable("movie_id") int movieId) throws InterruptedException, ExecutionException {
 
 		return movieService.getMovieRecommendations(movieId);
 	}
 
 	@GetMapping("/movie/{movie_id}/similar")
-	public HashMap<String, Object> getSimilarMovies(@PathVariable("movie_id") int movieId) {
+	public HashMap<String, Object> getSimilarMovies(@PathVariable("movie_id") int movieId) throws InterruptedException, ExecutionException {
 
 		return movieService.getSimilarMovies(movieId);
 	}
